@@ -1,14 +1,13 @@
 {
-  "name": "Hello Extensions of the world!",
-  "description": "Base Level Extension",
+  "name": "Event Catcher",
+  "description": "Catches events from emails instantly.",
   "version": "1.0",
   "manifest_version": 3,
   "content_scripts": [
     {
-      "js": ["scripts/content.js"],
+      "js": ["scripts/gmail.js"],
       "matches": [
-        "https://developer.chrome.com/docs/extensions/*",
-        "https://developer.chrome.com/docs/webstore/*"
+        "https://mail.google.com/mail/u/0/*"
       ]
     }
   ]
