@@ -16,7 +16,16 @@ const analyzeEmailContent = (emailBodyContent) => {
       "email-content": emailBodyContent
     }
   })
-    .then(response => console.log(response.text()))
+    .then(response => response.json())
+    .then(object => {
+      console.log(object);
+      for (let i = 0; i < object.length; i++) {
+        console.log(object[i].eventTitle);
+        const startDate = new Date(object[i].startYear, object[i].startMonth-1, object[i].startDay, object[i].startHour, object[i].startMinute).toISOString().replaceAll("-", "").replaceAll(":","");
+        const endDate = new Date(object[i].endYear, object[i].endMonth-1, object[i].endDay, object[i].endHour, object[i].endMinute).toISOString().replaceAll("-", "").replaceAll(":","");
+        console.log(`https://www.google.com/calendar/render?action=TEMPLATE&text=${object[i].eventTitle.replaceAll(" ", "+")}&details=${object[i].eventDescription.replaceAll(" ", "+")}&location=${object[i].eventLocation.replaceAll(" ", "+")}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`)
+      }
+    })
     .catch(error => console.error("Error:", error));  
 }
 

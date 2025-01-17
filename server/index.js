@@ -27,7 +27,11 @@ const schema = {
         type: SchemaType.STRING,
         nullable: false,
       },
-      locationTitle: {
+      eventLocation: {
+        type: SchemaType.STRING,
+        nullable: false,
+      },
+      eventDescription: {
         type: SchemaType.STRING,
         nullable: false,
       },
@@ -72,7 +76,7 @@ const schema = {
         nullable: false,
       },
     },
-    required: ["eventTitle", "startYear", "startMonth", "startDay", "startHour", "startMinute", "endYear", "endMonth", "endDay", "endHour", "endMinute"],
+    required: ["eventTitle", "startYear", "startMonth", "startDay", "startHour", "startMinute", "endYear", "endMonth", "endDay", "endHour", "endMinute", "eventLocation", "eventDescription"],
   },
 };
 const model = genAI.getGenerativeModel({ 
