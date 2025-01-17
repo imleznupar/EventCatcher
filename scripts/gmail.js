@@ -17,7 +17,6 @@ const analyzeEmailContent = (emailBodyContent) => {
     }
   })
     .then(response => console.log(response.text()))
-    .then(data => console.log(data))
     .catch(error => console.error("Error:", error));  
 }
 
