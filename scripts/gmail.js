@@ -5,8 +5,21 @@ const getEmailContent = () => {
   const emailBody = document.querySelector('.a3s'); // Gmail's email body class
   if (emailBody) {
     console.log("Email body detected:", emailBody.innerText);
+    analyzeEmailContent(encodeURIComponent(emailBody.innerText));
   }
 };
+
+const analyzeEmailContent = (emailBodyContent) => {
+  fetch("http://localhost:3000", {
+    method: "GET",
+    headers: {
+      "email-content": emailBodyContent
+    }
+  })
+    .then(response => console.log(response.text()))
+    .then(data => console.log(data))
+    .catch(error => console.error("Error:", error));  
+}
 
 // Function to check if the URL matches the desired format
 const isEmailViewUrl = (url) => {

@@ -1,10 +1,18 @@
 import dotenv from "dotenv";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import express from 'express';
+import cors from "cors";
 
 // config express
 const app = express();
 const port = 3000;
+
+const corsOptions = {
+  origin: 'https://mail.google.com',
+  methods: ['GET'],
+  allowedHeaders: ['email-content']
+};
+app.use(cors(corsOptions));
 
 // config gemini
 dotenv.config();
@@ -20,7 +28,7 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
-    const prompt = "how are you doing";
+    const prompt = decodeURIComponent(req.headers['email-content']) + "\n\ngenerate the following content:\ntitle:\ntime (dd/mm, from when to when):\nlocation:";
     const response = await run(prompt);
     res.send(response);
   } catch (error) {
