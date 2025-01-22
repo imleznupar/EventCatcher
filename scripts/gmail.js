@@ -56,6 +56,7 @@ const insertCollapsible = () => {
         display: flex;
         justify-content: center;
         align-items: center;
+        user-select: none;
       }
       .collapsible:not(.inactive):hover {
         background-color: rgb(236, 236, 236);
@@ -73,6 +74,23 @@ const insertCollapsible = () => {
       .inactive {
         color:rgb(170, 170, 170);
         cursor: wait;
+      }
+      .error {
+        cursor: default;
+      }
+      .error:after {
+        cursor: default;
+        content: '!';
+        background-color: rgb(244, 102, 102);
+        border-radius: 50%;
+        color: rgb(255, 255, 255);
+        width: 9px;
+        font-size: 7px;
+        text-align: center;
+        font-weight: bold;
+        position: relative;
+        top: -8px;
+        right: 11px;        
       }
       .content {
         background-color:rgb(255, 255, 255);
@@ -176,10 +194,16 @@ const updateCollapsible = (links, titles) => {
         content.style.display = "none";
       }
     });
+  } else if (collapsible) {
+    collapsible.style.cursor = "default";
   }
 }
 
 const errorCollapsible = () => {
+  const collapsible = document.querySelector('.collapsible');
+  if(collapsible) {
+    collapsible.classList.toggle("error");
+  }
 }
 
 let lastUrl = location.href;
