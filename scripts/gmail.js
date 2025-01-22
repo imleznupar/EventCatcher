@@ -43,88 +43,143 @@ const isEmailViewUrl = (url) => {
 };
 
 const insertCollapsible = () => {
-  const emailHeader = document.querySelector('.gE');
+  const emailHeader = document.querySelector('.g3');
   if(emailHeader) {
+    console.log("email header detected");
     const style = document.createElement('style');
     style.innerHTML = `
       .collapsible {
-        color: #555;
+        margin-left: 20px;
+        color:rgb(83, 83, 83);
+        height: 40px;
+        width: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .collapsible:not(.inactive):hover {
+        background-color: rgb(236, 236, 236);
+        border-radius: 50px;
+        color:rgb(96, 96, 96);
         cursor: pointer;
-        padding: 18px;
-        width: 90%;
-        border: none;
-        text-align: left;
-        font-size: 15px;
-        border-radius: 30px;
-        font-family: monospace;
-        font-weight: 600;
-        transition: all 0.5s ease;
-        margin: 20px 10px;
+        transition: all 0.5s ease-out;
       }
-
-      .active, .collapsible:hover {
-        background-color: #555;
-        color: #eeeeed;
+      .active {
+        background-color:rgb(220, 220, 220);
+        cursor: pointer;
+        border-radius: 50px;
+        transition: background-color 0.5s ease-out;
       }
-      
+      .inactive {
+        color:rgb(170, 170, 170);
+        cursor: wait;
+      }
       .content {
-        padding: 0 18px;
-        background-color: white;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.2s ease-out;
+        background-color:rgb(255, 255, 255);
+        position: absolute;
+        z-index: 1;
+        border-radius: 3px;
+        height: auto;
+        top: 55px;
+        box-shadow: 0 0 7px rgba(0,0,0,0.2);
+        width: 300px;
+        text-align: left;
       }
-    `;
+      .event {
+        padding: 0 10px 0 30px;
+        overflow: hidden;
+        text-overflow:ellipsis;
+        text-decoration: none;
+        display: block;
+        white-space: nowrap;
+      }
+      .event:hover {
+        background-color:rgb(241, 241, 241);
+        transition: background-color 0.5s ease-out;
+      }
+      .acZ {
+        height: 40px;
+      }
+      `;
+
     document.head.appendChild(style);
 
-    console.log("email header detected");
-    const collapsible = document.createElement("button");
+    document.head.insertAdjacentHTML("afterend", '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,350,0,0&icon_names=calendar_add_on" />');
+
+    const collapsible = document.createElement("div");
     collapsible.classList.add("collapsible");
-    collapsible.textContent = "Catching events...";
-    emailHeader.insertAdjacentElement("afterend", collapsible);
+    collapsible.classList.add("inactive");
+
+    const icon = document.createElement("span");
+    icon.className = "material-symbols-outlined";
+    icon.textContent = "calendar_add_on";
+    collapsible.appendChild(icon);
 
     const content = document.createElement("div");
     content.classList.add("content");
-    collapsible.insertAdjacentElement("afterend", content);
+    content.style.display = "none";
+    collapsible.appendChild(content);
+
+    emailHeader.insertAdjacentElement("afterend", collapsible);
+  }
+
+  const icons = document.querySelector(".gH.bAk");
+  if(icons){
+    icons.style.display = "flex";
   }
 }
 
 const updateCollapsible = (links, titles) => {
   const collapsible = document.querySelector('.collapsible');
-  if(collapsible) {
-    if(links.length == 0){
-      collapsible.textContent = `Couldn't catch any event`;
-    } else {
-      // change content text
-      const content = collapsible.nextElementSibling;
-      for(var i = 0; i < links.length; i++) {
-        const anEvent = document.createElement("a");
-        anEvent.textContent = titles[i];
-        anEvent.style.display = "block";
-        const attr = document.createAttribute("href");
-        attr.value = links[i];
-        anEvent.setAttributeNode(attr);
-        content.appendChild(anEvent);
-      }
+  const content = document.querySelector('.content');
+  if(collapsible && content && links.length > 0) {
+    // change content text
+    for(var i = 0; i < links.length; i++) {
+      const anEvent = document.createElement("a");
+      anEvent.classList.add("event");
+      const attr = document.createAttribute("href");
+      attr.value = links[i];
+      anEvent.setAttributeNode(attr);
 
-      collapsible.textContent = `Caught ${links.length} event(s)`;
-      collapsible.addEventListener("click", function() {
-        this.classList.toggle("active");
-        if (content.style.maxHeight){
-          content.style.maxHeight = null;
-        } else {
-          content.style.maxHeight = content.scrollHeight + "px";
-        }    
-      });
+      const anEventDiv = document.createElement("div");
+      const anEventText = document.createElement("p");
+      const anEventIcon = document.createElement("p");
+      const anEventMid = document.createElement("p");
+      anEventDiv.style.display = "flex";
+      anEventDiv.style.margin = "0";
+      anEventText.textContent = titles[i];
+      anEventText.style.width = "80%";
+      anEventText.style.overflow = "hidden";
+      anEventText.style.whiteSpace = "nowrap";
+      anEventText.style.textOverflow = "ellipsis";
+      anEventText.style.color = "rgb(83, 83, 83)";
+      anEventText.style.fontWeight = "500";
+      anEventMid.style.width = "10%";
+      anEventIcon.textContent = "+";
+      anEventIcon.style.width = "10%";
+      anEventIcon.style.transform = "scale(1.5)";
+      anEventIcon.style.color = "rgb(83, 83, 83)";
+      anEventDiv.appendChild(anEventText);
+      anEventDiv.appendChild(anEventMid);
+      anEventDiv.appendChild(anEventIcon);
+      anEvent.appendChild(anEventDiv)
+      content.appendChild(anEvent);
     }
+
+    collapsible.classList.toggle("inactive");
+    collapsible.addEventListener("click", function() {
+      console.log("active collapsible");
+      this.classList.toggle("active");
+      if (content.style.display == "none"){
+        content.style.display = "block";
+      } else {
+        content.style.display = "none";
+      }
+    });
   }
 }
 
 const errorCollapsible = () => {
-  const collapsible = document.querySelector('.collapsible');
-  if(collapsible){
-    collapsible.textContent = `Unexpected Error :(`;
-  }
 }
 
 let lastUrl = location.href;
