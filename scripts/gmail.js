@@ -37,15 +37,15 @@ const analyzeEmailContent = (emailBodyContent) => {
 
 // Function to check if the URL matches the desired format
 const isEmailViewUrl = (url) => {
-  // TODO: improve for different url links (diff user)
   // TODO: add feature to previous threads
-  const emailViewRegex = /^https:\/\/mail\.google\.com\/mail\/u\/\d+\/#\w+\/[^?]+$/;
+  const emailViewRegex = /^https:\/\/mail\.google\.com\/mail\/u\/\d+\/(\?[a-zA-z]*)?#\w+\/[^?]+$/;
   return emailViewRegex.test(url);
 };
 
 const insertCollapsible = () => {
   const allHeaders = document.querySelectorAll('.g3');
-  if(allHeaders) {
+  const prevCollapse = document.querySelector('.collapsible');
+  if(allHeaders && !prevCollapse) {
     const emailHeader = allHeaders.item(allHeaders.length-1);
     console.log("email header detected");
     const style = document.createElement('style');
