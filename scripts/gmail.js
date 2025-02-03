@@ -38,14 +38,15 @@ const analyzeEmailContent = (emailBodyContent) => {
 // Function to check if the URL matches the desired format
 const isEmailViewUrl = (url) => {
   // TODO: improve for different url links (diff user)
-  // TODO: improve UI for replies
+  // TODO: add feature to previous threads
   const emailViewRegex = /^https:\/\/mail\.google\.com\/mail\/u\/\d+\/#\w+\/[^?]+$/;
   return emailViewRegex.test(url);
 };
 
 const insertCollapsible = () => {
-  const emailHeader = document.querySelector('.g3');
-  if(emailHeader) {
+  const allHeaders = document.querySelectorAll('.g3');
+  if(allHeaders) {
+    const emailHeader = allHeaders.item(allHeaders.length-1);
     console.log("email header detected");
     const style = document.createElement('style');
     style.innerHTML = `
@@ -116,8 +117,8 @@ const insertCollapsible = () => {
         background-color:rgb(241, 241, 241);
         transition: background-color 0.3s ease-out;
       }
-      .acZ {
-        height: 40px;
+      .hx .gH.bAk {
+        display: flex;
       }
       `;
 
@@ -142,11 +143,6 @@ const insertCollapsible = () => {
     emailHeader.insertAdjacentElement("afterend", collapsible);
   } else {
     console.log("NO email header detected");
-  }
-
-  const icons = document.querySelector(".gH.bAk");
-  if(icons){
-    icons.style.display = "flex";
   }
 }
 
