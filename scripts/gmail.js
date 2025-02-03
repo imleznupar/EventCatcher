@@ -11,7 +11,6 @@ const analyzeEmailContent = (emailBodyContent) => {
   fetch("http://localhost:3000", {
     method: "GET",
     headers: {
-      // TODO: supply current date
       "email-content": emailBodyContent
     }
   })
@@ -38,6 +37,8 @@ const analyzeEmailContent = (emailBodyContent) => {
 
 // Function to check if the URL matches the desired format
 const isEmailViewUrl = (url) => {
+  // TODO: improve for different url links (diff user)
+  // TODO: improve UI for replies
   const emailViewRegex = /^https:\/\/mail\.google\.com\/mail\/u\/\d+\/#\w+\/[^?]+$/;
   return emailViewRegex.test(url);
 };
@@ -113,7 +114,7 @@ const insertCollapsible = () => {
       }
       .event:hover {
         background-color:rgb(241, 241, 241);
-        transition: background-color 0.5s ease-out;
+        transition: background-color 0.3s ease-out;
       }
       .acZ {
         height: 40px;
@@ -139,6 +140,8 @@ const insertCollapsible = () => {
     collapsible.appendChild(content);
 
     emailHeader.insertAdjacentElement("afterend", collapsible);
+  } else {
+    console.log("NO email header detected");
   }
 
   const icons = document.querySelector(".gH.bAk");
@@ -206,24 +209,38 @@ const errorCollapsible = () => {
   }
 }
 
-let lastUrl = location.href;
+function checkForElement() {
+  console.log("Checking for .g3...");
+  const element = document.querySelector('.g3');
+  if (element) {
+      run(lastUrl);
+  } else {
+      setTimeout(checkForElement, 500);
+  }
+}
 
-// TODO: handle initial load of email
+let lastUrl = location.href;
+if(isEmailViewUrl(lastUrl)) {
+  checkForElement();
+}
+
+const run = (currentUrl) => {
+  lastUrl = currentUrl;
+
+  // Check if the current URL matches the email view format
+  if (isEmailViewUrl(currentUrl)) {
+      console.log("Email view detected:", currentUrl);
+      insertCollapsible();
+      getEmailContent();
+  } else {
+      console.log("Not an email view URL.");
+  }
+}
+
 const urlObserver = new MutationObserver(() => {
   const currentUrl = location.href;
   if (currentUrl !== lastUrl) {
-    lastUrl = currentUrl;
-
-    // Check if the current URL matches the email view format
-    if (isEmailViewUrl(currentUrl)) {
-        console.log("Email view detected:", currentUrl);
-        insertCollapsible();
-        getEmailContent();
-    } else {
-        console.log("Not an email view URL.");
-    }    
+    run(currentUrl);
   }
 });
-
 urlObserver.observe(document.body, { childList: true, subtree: true });
-

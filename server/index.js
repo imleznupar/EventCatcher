@@ -95,6 +95,7 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
+    // TODO: improve prompt
     const prompt = decodeURIComponent(req.headers['email-content']) + "\n\ngenerate the list of events in the email above. if none, return empty list.";
     const response = await run(prompt);
     res.send(response);
