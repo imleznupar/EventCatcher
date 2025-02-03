@@ -86,13 +86,13 @@ const insertCollapsible = () => {
         background-color: rgb(244, 102, 102);
         border-radius: 50%;
         color: rgb(255, 255, 255);
-        width: 9px;
-        font-size: 7px;
+        width: 13px;
+        font-size: 10px;
         text-align: center;
         font-weight: bold;
         position: relative;
-        top: -8px;
-        right: 11px;        
+        top: 7px;
+        right: 10px;        
       }
       .content {
         background-color:rgb(255, 255, 255);
