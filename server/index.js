@@ -95,9 +95,9 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
-    // TODO: improve prompt
-    const prompt = decodeURIComponent(req.headers['email-content']) + "\n\ngenerate the list of events in the email above. if none, return empty list.";
+    const prompt = "Generate the list of events in the email above. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. For reference, today's date is " + new Date(Date.now()).toString() + ".\nEmail body:\n" + decodeURIComponent(req.headers['email-content']);
     const response = await run(prompt);
+    console.log(prompt);
     res.send(response);
   } catch (error) {
     console.error("Error generating content:", error);
