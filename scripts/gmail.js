@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 // Get the content of the current email
 const getEmailContent = () => {
   const emailBody = document.querySelector('.a3s');
