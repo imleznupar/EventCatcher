@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 const corsOptions = {
   origin: 'https://mail.google.com',
   methods: ['GET'],
-  allowedHeaders: ['email-content']
+  allowedHeaders: ['email-content', 'email-title', 'email-date']
 };
 app.use(cors(corsOptions));
 
@@ -80,7 +80,7 @@ const schema = {
   },
 };
 const model = genAI.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
+  model: "gemini-2.0-flash",
   generationConfig: {
     responseMimeType: "application/json",
     responseSchema: schema,
@@ -95,7 +95,7 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
-    const prompt = "Generate the list of events in the email above. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. For reference, today's date is " + new Date(Date.now()).toString() + ".\nEmail body:\n" + decodeURIComponent(req.headers['email-content']);
+    const prompt = "Generate the list of events in the email below. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. For reference, today's date is " + new Date(Date.now()).toString() + "\nEmail Title:\n" + decodeURIComponent(req.headers['email-title']) + "\nEmail Sent Date:\n" + decodeURIComponent(req.headers['email-date']) + ".\nEmail Body:\n" + decodeURIComponent(req.headers['email-content']);
     const response = await run(prompt);
     console.log(prompt);
     res.send(response);

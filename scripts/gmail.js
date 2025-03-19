@@ -1,17 +1,26 @@
+require('dotenv').config();
+
 // Get the content of the current email
 const getEmailContent = () => {
   const emailBody = document.querySelector('.a3s');
-  if (emailBody) {
-    console.log("Email body detected:", emailBody.innerText);
-    analyzeEmailContent(encodeURIComponent(emailBody.innerText));
+  const emailTitle = document.querySelector('.hP');
+  const allDates = document.querySelectorAll('.g3');
+  const emailDate = allDates.item(allDates.length-1);
+  if (emailBody && emailTitle && emailDate) {
+    console.log("Email title/body detected");
+    analyzeEmailContent(encodeURIComponent(emailBody.innerText), encodeURIComponent(emailTitle.innerText), encodeURIComponent(emailDate.innerText));
+  } else {
+    console.log("no body or title");
   }
 };
 
-const analyzeEmailContent = (emailBodyContent) => {
-  fetch("http://localhost:3000", {
+const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateContent) => {
+  fetch(BACKEND_URL, {
     method: "GET",
     headers: {
-      "email-content": emailBodyContent
+      "email-content": emailBodyContent,
+      "email-title": emailTitleContent,
+      "email-date": emailDateContent
     }
   })
     .then(response => response.json())
