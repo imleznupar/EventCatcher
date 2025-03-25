@@ -4,22 +4,42 @@ const getEmailContent = () => {
   const emailTitle = document.querySelector('.hP');
   const allDates = document.querySelectorAll('.g3');
   const emailDate = allDates.item(allDates.length-1);
+
+  const history = document.querySelectorAll('.adL');
+  var emailHistory = null;
+
+  if (history) {
+    history.forEach(element => {
+      if (element.innerText.trim()) {
+        emailHistory = element.innerText.trim();
+      }
+    });
+  }
   if (emailBody && emailTitle && emailDate) {
-    emailBodyText = emailBody.innerText;
-    if (emailBodyText.length > 10000) {
-      emailBodyText = emailBodyText.substring(0, 10000);
+    var emailBodyTrimmed = emailBody.innerText;
+    if (encodeURIComponent(emailBodyTrimmed).length > 10000) {
+      emailHistory = null;
+      while (encodeURIComponent(emailBodyTrimmed).length > 10000) {
+        emailBodyTrimmed = emailBodyTrimmed.substring(0, emailBodyTrimmed.length - 100);
+      }
+    } else if (emailHistory) {
+      const limit = 10000 - encodeURIComponent(emailBodyTrimmed).length;
+      while (encodeURIComponent(emailHistory).length > limit) {
+        emailHistory = emailHistory.substring(0, emailHistory.length - 100);
+      }
     }
-    analyzeEmailContent(encodeURIComponent(emailBodyText), encodeURIComponent(emailTitle.innerText), encodeURIComponent(emailDate.innerText));
+    analyzeEmailContent(encodeURIComponent(emailBodyTrimmed), encodeURIComponent(emailTitle.innerText), encodeURIComponent(emailDate.innerText), encodeURIComponent(emailHistory));
   }
 };
 
-const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateContent) => {
-  fetch(BACKEND_URL, {
+const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateContent, emailHistoryContent) => {
+  fetch("http://localhost:3000/", {
     method: "GET",
     headers: {
       "email-content": emailBodyContent,
       "email-title": emailTitleContent,
-      "email-date": emailDateContent
+      "email-date": emailDateContent,
+      "email-history": emailHistoryContent
     }
   })
     .then(response => response.json())

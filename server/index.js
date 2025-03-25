@@ -10,7 +10,7 @@ const port = process.env.PORT || 3000;
 const corsOptions = {
   origin: 'https://mail.google.com',
   methods: ['GET'],
-  allowedHeaders: ['email-content', 'email-title', 'email-date']
+  allowedHeaders: ['email-content', 'email-title', 'email-date', 'email-history']
 };
 app.use(cors(corsOptions));
 
@@ -95,9 +95,12 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
-    const prompt = "Generate the list of events in the email below. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. For reference, today's date is " + new Date(Date.now()).toString() + "\nEmail Title:\n" + decodeURIComponent(req.headers['email-title']) + "\nEmail Sent Date:\n" + decodeURIComponent(req.headers['email-date']) + ".\nEmail Body:\n" + decodeURIComponent(req.headers['email-content']);
+    var prompt = "Generate the list of events in the email below. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. If the event was modify, only count the newest information. For reference, today's date is " + new Date(Date.now()).toString();
+    prompt += "\nEmail Title:\n" + decodeURIComponent(req.headers['email-title']) + "\nEmail Sent Date:\n" + decodeURIComponent(req.headers['email-date']) + ".\nEmail Body:\n" + decodeURIComponent(req.headers['email-content']);
+    if (decodeURIComponent(req.headers['email-history']) != "null") {
+      prompt += ".\nEmail History (from most recent to oldest):\n" + decodeURIComponent(req.headers['email-history']);
+    }
     const response = await run(prompt);
-    console.log(prompt);
     res.send(response);
   } catch (error) {
     console.error("Error generating content:", error);
