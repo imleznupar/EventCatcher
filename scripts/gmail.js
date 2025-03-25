@@ -226,34 +226,37 @@ const errorCollapsible = () => {
   }
 }
 
-function checkForElement() {
-  const element = document.querySelector('.g3');
-  if (element) {
-      run(lastUrl);
-  } else {
-      setTimeout(checkForElement, 500);
+let limit = 10;
+let lastUrl = location.href;
+
+function checkForElement(url, counter) {
+  if (counter < limit) {
+    const element = document.querySelector('.g3');
+    const coll = document.querySelector('.collapsible')
+    if (element && !coll) {
+        run(url);
+    } else {
+        setTimeout(function() {
+          checkForElement(url, counter + 1);
+        }, 100);
+    }
   }
 }
 
-let lastUrl = location.href;
 if(isEmailViewUrl(lastUrl)) {
-  checkForElement();
+  checkForElement(lastUrl, -100);
 }
 
 const run = (currentUrl) => {
-  lastUrl = currentUrl;
-
-  // Check if the current URL matches the email view format
-  if (isEmailViewUrl(currentUrl)) {
-      insertCollapsible();
-      getEmailContent();
-  }
+  insertCollapsible();
+  getEmailContent();
 }
 
 const urlObserver = new MutationObserver(() => {
   const currentUrl = location.href;
-  if (currentUrl !== lastUrl) {
-    run(currentUrl);
+  if (currentUrl !== lastUrl && isEmailViewUrl(currentUrl)) {
+    lastUrl = currentUrl;
+    checkForElement(currentUrl, 0);
   }
 });
 urlObserver.observe(document.body, { childList: true, subtree: true });
