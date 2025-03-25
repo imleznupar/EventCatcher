@@ -5,10 +5,11 @@ const getEmailContent = () => {
   const allDates = document.querySelectorAll('.g3');
   const emailDate = allDates.item(allDates.length-1);
   if (emailBody && emailTitle && emailDate) {
-    console.log("Email title/body detected");
-    analyzeEmailContent(encodeURIComponent(emailBody.innerText), encodeURIComponent(emailTitle.innerText), encodeURIComponent(emailDate.innerText));
-  } else {
-    console.log("no body or title");
+    emailBodyText = emailBody.innerText;
+    if (emailBodyText.length > 10000) {
+      emailBodyText = emailBodyText.substring(0, 10000);
+    }
+    analyzeEmailContent(encodeURIComponent(emailBodyText), encodeURIComponent(emailTitle.innerText), encodeURIComponent(emailDate.innerText));
   }
 };
 
@@ -23,16 +24,13 @@ const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateConte
   })
     .then(response => response.json())
     .then(object => {
-      console.log(object);
       const links = [];
       const titles = [];
       for (let i = 0; i < object.length; i++) {
-        console.log(object[i].eventTitle);
         const startDate = new Date(object[i].startYear, object[i].startMonth-1, object[i].startDay, object[i].startHour, object[i].startMinute).toISOString().replaceAll("-", "").replaceAll(":","");
         const endDate = new Date(object[i].endYear, object[i].endMonth-1, object[i].endDay, object[i].endHour, object[i].endMinute).toISOString().replaceAll("-", "").replaceAll(":","");
         links[i] = `https://www.google.com/calendar/render?action=TEMPLATE&text=${object[i].eventTitle.replaceAll(" ", "+")}&details=${object[i].eventDescription.replaceAll(" ", "+")}&location=${object[i].eventLocation.replaceAll(" ", "+")}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`
         titles[i] = object[i].eventTitle;
-        console.log(`https://www.google.com/calendar/render?action=TEMPLATE&text=${object[i].eventTitle.replaceAll(" ", "+")}&details=${object[i].eventDescription.replaceAll(" ", "+")}&location=${object[i].eventLocation.replaceAll(" ", "+")}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`);
       }
       updateCollapsible(links, titles);
     })
@@ -54,7 +52,6 @@ const insertCollapsible = () => {
   const prevCollapse = document.querySelector('.collapsible');
   if(allHeaders && !prevCollapse) {
     const emailHeader = allHeaders.item(allHeaders.length-1);
-    console.log("email header detected");
     const style = document.createElement('style');
     style.innerHTML = `
       .collapsible {
@@ -148,8 +145,6 @@ const insertCollapsible = () => {
     collapsible.appendChild(content);
 
     emailHeader.insertAdjacentElement("afterend", collapsible);
-  } else {
-    console.log("NO email header detected");
   }
 }
 
@@ -192,7 +187,6 @@ const updateCollapsible = (links, titles) => {
 
     collapsible.classList.toggle("inactive");
     collapsible.addEventListener("click", function() {
-      console.log("active collapsible");
       this.classList.toggle("active");
       if (content.style.display == "none"){
         content.style.display = "block";
@@ -213,7 +207,6 @@ const errorCollapsible = () => {
 }
 
 function checkForElement() {
-  console.log("Checking for .g3...");
   const element = document.querySelector('.g3');
   if (element) {
       run(lastUrl);
@@ -232,11 +225,8 @@ const run = (currentUrl) => {
 
   // Check if the current URL matches the email view format
   if (isEmailViewUrl(currentUrl)) {
-      console.log("Email view detected:", currentUrl);
       insertCollapsible();
       getEmailContent();
-  } else {
-      console.log("Not an email view URL.");
   }
 }
 
