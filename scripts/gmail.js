@@ -1,3 +1,7 @@
+let limit = 10;
+let lastUrl = location.href;
+let controller = new AbortController();
+
 // Get the content of the current email
 const getEmailContent = () => {
   const emailBody = document.querySelector('.a3s');
@@ -33,6 +37,9 @@ const getEmailContent = () => {
 };
 
 const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateContent, emailHistoryContent) => {
+  controller.abort();
+  controller = new AbortController();
+  
   fetch("http://localhost:3000/", {
     method: "GET",
     headers: {
@@ -40,7 +47,8 @@ const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateConte
       "email-title": emailTitleContent,
       "email-date": emailDateContent,
       "email-history": emailHistoryContent
-    }
+    },
+    signal: controller.signal
   })
     .then(response => response.json())
     .then(object => {
@@ -50,13 +58,18 @@ const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateConte
         const startDate = new Date(object[i].startYear, object[i].startMonth-1, object[i].startDay, object[i].startHour, object[i].startMinute).toISOString().replaceAll("-", "").replaceAll(":","");
         const endDate = new Date(object[i].endYear, object[i].endMonth-1, object[i].endDay, object[i].endHour, object[i].endMinute).toISOString().replaceAll("-", "").replaceAll(":","");
         links[i] = `https://www.google.com/calendar/render?action=TEMPLATE&text=${object[i].eventTitle.replaceAll(" ", "+")}&details=${object[i].eventDescription.replaceAll(" ", "+")}&location=${object[i].eventLocation.replaceAll(" ", "+")}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`
-        titles[i] = object[i].eventTitle;
+        if (object[i].isTask == true) {
+          titles[i] = "[Task] " + object[i].eventTitle;
+        } else {
+          titles[i] = object[i].eventTitle;
+        }
       }
       updateCollapsible(links, titles);
     })
     .catch(error => {
-      console.error("Error:", error);
-      errorCollapsible();
+      if (error.name !== 'AbortError') {
+        errorCollapsible();
+      }
     });  
 }
 
@@ -225,9 +238,6 @@ const errorCollapsible = () => {
     collapsible.classList.toggle("error");
   }
 }
-
-let limit = 10;
-let lastUrl = location.href;
 
 function checkForElement(url, counter) {
   if (counter < limit) {

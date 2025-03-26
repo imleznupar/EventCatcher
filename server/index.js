@@ -75,8 +75,12 @@ const schema = {
         type: SchemaType.INTEGER,
         nullable: false,
       },
+      isTask: {
+        type: SchemaType.BOOLEAN,
+        nullable: false,
+      }
     },
-    required: ["eventTitle", "startYear", "startMonth", "startDay", "startHour", "startMinute", "endYear", "endMonth", "endDay", "endHour", "endMinute", "eventLocation", "eventDescription"],
+    required: ["eventTitle", "startYear", "startMonth", "startDay", "startHour", "startMinute", "endYear", "endMonth", "endDay", "endHour", "endMinute", "eventLocation", "eventDescription", "isTask"],
   },
 };
 const model = genAI.getGenerativeModel({ 
@@ -95,7 +99,7 @@ async function run(prompt) {
 // setup app
 app.get("/", async function (req, res) {
   try {
-    var prompt = "Generate the list of events in the email below. An event is defined to have a clear start and end time, and location (can be online). If none, return empty list. If the event was modify, only count the newest information. For reference, today's date is " + new Date(Date.now()).toString();
+    var prompt = "Generate the list of events in the email below. An event is defined to have a clear start and end time, and location (can be online). Also, identify if it is a task. A task is defined to have only one time point, such as deadlines, so the start time and end time should be the same. If none, return empty list. If the event was modify, only count the newest information. For reference, today's date is " + new Date(Date.now()).toString();
     prompt += "\nEmail Title:\n" + decodeURIComponent(req.headers['email-title']) + "\nEmail Sent Date:\n" + decodeURIComponent(req.headers['email-date']) + ".\nEmail Body:\n" + decodeURIComponent(req.headers['email-content']);
     if (decodeURIComponent(req.headers['email-history']) != "null") {
       prompt += ".\nEmail History (from most recent to oldest):\n" + decodeURIComponent(req.headers['email-history']);
