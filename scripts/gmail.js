@@ -57,12 +57,12 @@ const analyzeEmailContent = (emailBodyContent, emailTitleContent, emailDateConte
       for (let i = 0; i < object.length; i++) {
         const startDate = new Date(object[i].startYear, object[i].startMonth-1, object[i].startDay, object[i].startHour, object[i].startMinute).toISOString().replaceAll("-", "").replaceAll(":","");
         const endDate = new Date(object[i].endYear, object[i].endMonth-1, object[i].endDay, object[i].endHour, object[i].endMinute).toISOString().replaceAll("-", "").replaceAll(":","");
-        links[i] = `https://www.google.com/calendar/render?action=TEMPLATE&text=${object[i].eventTitle.replaceAll(" ", "+")}&details=${object[i].eventDescription.replaceAll(" ", "+")}&location=${object[i].eventLocation.replaceAll(" ", "+")}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`
         if (object[i].isTask == true) {
           titles[i] = "[Task] " + object[i].eventTitle;
         } else {
           titles[i] = object[i].eventTitle;
         }
+        links[i] = `https://www.google.com/calendar/render?action=TEMPLATE&text=${titles[i]}&details=${object[i].eventDescription}&location=${object[i].eventLocation}&dates=${startDate.slice(0,-5)}Z%2F${endDate.slice(0,-5)}Z`
       }
       updateCollapsible(links, titles);
     })
@@ -157,11 +157,18 @@ const insertCollapsible = () => {
       .hx .gH.bAk {
         display: flex;
       }
+      hr {
+        border: 0;
+        border-top: 1px solid rgb(227, 227, 227);
+        margin: 0;
+        padding: 0;
+      }
+
       `;
 
     document.head.appendChild(style);
 
-    document.head.insertAdjacentHTML("afterend", '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,350,0,0&icon_names=calendar_add_on" />');
+    document.head.insertAdjacentHTML("afterend", '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20,350,0,0&icon_names=add,calendar_add_on,open_in_new" />');
 
     const collapsible = document.createElement("div");
     collapsible.classList.add("collapsible");
@@ -187,35 +194,18 @@ const updateCollapsible = (links, titles) => {
   if(collapsible && content && links.length > 0) {
     // change content text
     for(var i = 0; i < links.length; i++) {
-      const anEvent = document.createElement("a");
-      anEvent.classList.add("event");
-      const attr = document.createAttribute("href");
-      attr.value = links[i];
-      anEvent.setAttributeNode(attr);
-
-      const anEventDiv = document.createElement("div");
-      const anEventText = document.createElement("p");
-      const anEventIcon = document.createElement("p");
-      const anEventMid = document.createElement("p");
-      anEventDiv.style.display = "flex";
-      anEventDiv.style.margin = "0";
-      anEventText.textContent = titles[i];
-      anEventText.style.width = "80%";
-      anEventText.style.overflow = "hidden";
-      anEventText.style.whiteSpace = "nowrap";
-      anEventText.style.textOverflow = "ellipsis";
-      anEventText.style.color = "rgb(83, 83, 83)";
-      anEventText.style.fontWeight = "500";
-      anEventMid.style.width = "10%";
-      anEventIcon.textContent = "+";
-      anEventIcon.style.width = "10%";
-      anEventIcon.style.transform = "scale(1.5)";
-      anEventIcon.style.color = "rgb(83, 83, 83)";
-      anEventDiv.appendChild(anEventText);
-      anEventDiv.appendChild(anEventMid);
-      anEventDiv.appendChild(anEventIcon);
-      anEvent.appendChild(anEventDiv)
-      content.appendChild(anEvent);
+      content.appendChild(createAnEvent(links[i], titles[i], "add"));
+    }
+    if (links.length > 1) {
+      const divider = document.createElement("hr");
+      content.appendChild(divider);
+      const openAll = createAnEvent("#", "Open All Events", "open_in_new");
+      openAll.addEventListener("click", function() {
+        for(var i = 0; i < links.length; i++) {
+          window.open(links[i]);
+        }
+      });
+      content.appendChild(openAll);
     }
 
     collapsible.classList.toggle("inactive");
@@ -237,6 +227,41 @@ const errorCollapsible = () => {
   if(collapsible) {
     collapsible.classList.toggle("error");
   }
+}
+
+function createAnEvent(link, text, iconName) {
+      const anEvent = document.createElement("a");
+      anEvent.classList.add("event");
+      const attr = document.createAttribute("href");
+      attr.value = link;
+      anEvent.setAttributeNode(attr);
+
+      const anEventDiv = document.createElement("div");
+      const anEventText = document.createElement("p");
+      const anEventIcon = document.createElement("span");
+      const anEventMid = document.createElement("p");
+      anEventDiv.style.display = "flex";
+      anEventDiv.style.margin = "0";
+      anEventText.textContent = text;
+      anEventText.style.width = "80%";
+      anEventText.style.overflow = "hidden";
+      anEventText.style.whiteSpace = "nowrap";
+      anEventText.style.textOverflow = "ellipsis";
+      anEventText.style.color = "rgb(83, 83, 83)";
+      anEventText.style.fontWeight = "500";
+      anEventMid.style.width = "10%";
+      anEventIcon.className = "material-symbols-outlined";
+      anEventIcon.textContent = iconName;
+      anEventIcon.style.width = "10%";
+      anEventIcon.style.marginTop = "9px";
+      anEventIcon.style.color = "rgb(83, 83, 83)";
+      anEventIcon.style.fontVariationSettings = "'wght' 550";
+      anEventIcon.style.scale = "0.75";
+      anEventDiv.appendChild(anEventText);
+      anEventDiv.appendChild(anEventMid);
+      anEventDiv.appendChild(anEventIcon);
+      anEvent.appendChild(anEventDiv);
+      return anEvent;
 }
 
 function checkForElement(url, counter) {
@@ -264,9 +289,11 @@ const run = (currentUrl) => {
 
 const urlObserver = new MutationObserver(() => {
   const currentUrl = location.href;
-  if (currentUrl !== lastUrl && isEmailViewUrl(currentUrl)) {
+  if (currentUrl !== lastUrl) {
     lastUrl = currentUrl;
-    checkForElement(currentUrl, 0);
+    if (isEmailViewUrl(currentUrl)) {
+      checkForElement(currentUrl, 0);
+    }
   }
 });
 urlObserver.observe(document.body, { childList: true, subtree: true });
