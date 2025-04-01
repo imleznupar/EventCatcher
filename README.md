@@ -22,6 +22,21 @@ The content of the email is sent to the backend, where it utilizes the power of 
 #### Generate Calendar Link
 Finally, using the JSON response, we can easily generate a Google Calendar event with an URL that contains the title, start/end time, and other details about the event. 
 
+## Version History
+#### Version 1.1
+> March 31, 2025
+
+Bugs fixed
+* Email too long
+* Not working with older/newer buttons
+
+Features added
+* Read entire email threads
+* Open all events
+* Task labels
+#### Version 1.0
+> March 23, 2025
+
 ## Acknowledgements
 * [Chrome Extensions](https://developer.chrome.com/docs/extensions)
 
