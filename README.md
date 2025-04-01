@@ -13,6 +13,7 @@ The following is required:
 > **_NOTE:_**
 > * If you don't see the add-event icon in Gmail, try reopening Gmail with [this link](https://mail.google.com/mail/u/0/#inbox)
 > * Currently, only works when Gmail's "Reading Panel" is set to "No Split"
+> * "Open All Events" require pop-ups allowed
 
 ## How it works
 #### Read Email
